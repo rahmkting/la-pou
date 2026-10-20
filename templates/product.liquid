@@ -20,7 +20,7 @@
               {%- endfor -%}
             </select>
           {%- else -%}
-            <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
           {%- endif -%}
           <button class="btn btn--fill btn--wide" type="submit" {% unless product.available %}disabled{% endunless %}>
             {% if product.available %}Add to bag{% else %}Sold out{% endif %}

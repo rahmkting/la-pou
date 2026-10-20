@@ -2,9 +2,9 @@
   assign p1 = section.settings.product_single
   assign p3 = section.settings.product_three
   assign p6 = section.settings.product_six
-  assign v1 = p1.variants.first
-  assign v3 = p3.variants.first
-  assign v6 = p6.variants.first
+  assign v1 = p1.selected_or_first_available_variant
+  assign v3 = p3.selected_or_first_available_variant
+  assign v6 = p6.selected_or_first_available_variant
   assign wired = false
   if v1 != blank and v3 != blank and v6 != blank
     assign wired = true
