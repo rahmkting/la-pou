@@ -1,6 +1,24 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
-    "landing": { "type": "landing", "settings": {} }
+    "landing": {
+      "type": "landing",
+      "settings": {
+        "product_single": "pdrn-pink-collagen-volume-multi-balm",
+        "product_three": "pdrn-pink-collagen-volume-balm-3-pack",
+        "product_six": "pdrn-pink-collagen-volume-balm-6-pack"
+      }
+    }
   },
-  "order": ["landing"]
+  "order": [
+    "landing"
+  ]
 }
