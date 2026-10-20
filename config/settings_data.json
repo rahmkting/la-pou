@@ -1,3 +1,30 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
-  "current": {}
+  "current": {
+    "sections": {
+      "cart-drawer": {
+        "type": "cart-drawer",
+        "settings": {
+          "timer_minutes": 10,
+          "free_shipping_threshold": 0,
+          "upsell_products": [],
+          "upsell_heading": "Complete your routine",
+          "upsell_subheading": "Added by women who bought the balm",
+          "protection_product": "premium-shipping-insurance",
+          "protection_note": "Covers loss, theft and damage in transit",
+          "show_payment_icons": true,
+          "footer_note": "Free shipping included. 30 day guarantee."
+        }
+      }
+    },
+    "content_for_index": []
+  }
 }
