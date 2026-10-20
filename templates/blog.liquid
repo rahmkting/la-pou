@@ -1,0 +1,12 @@
+<section class="inner">
+  <div class="wrap inner__narrow">
+    <h1 class="h2">{{ blog.title }}</h1>
+    {%- for article in blog.articles -%}
+      <article class="qa">
+        <h2 class="row__h"><a href="{{ article.url }}">{{ article.title }}</a></h2>
+        <p class="fine">{{ article.published_at | date: "%-d %B %Y" }}</p>
+        <p>{{ article.excerpt_or_content | strip_html | truncate: 200 }}</p>
+      </article>
+    {%- endfor -%}
+  </div>
+</section>

@@ -1,0 +1,23 @@
+<section class="inner">
+  <div class="wrap">
+    <h1 class="h2 center">{{ collection.title }}</h1>
+    {%- if collection.description != blank -%}<div class="rte center">{{ collection.description }}</div>{%- endif -%}
+    <ul class="trio">
+      {%- for product in collection.products -%}
+        <li class="tcard">
+          <a class="tcard__shot" href="{{ product.url }}">
+            {%- if product.featured_image -%}
+              {{ product.featured_image | image_url: width: 600 | image_tag: loading: 'lazy' }}
+            {%- endif -%}
+          </a>
+          <h2 class="tcard__h">{{ product.title }}</h2>
+          <p class="tcard__price">{{ product.price | money }}</p>
+          <a class="btn btn--line btn--sm" href="{{ product.url }}">View</a>
+        </li>
+      {%- else -%}
+        <li><p class="lede">Nothing here yet.</p></li>
+      {%- endfor -%}
+    </ul>
+    {%- paginate collection.products by 12 -%}{{ paginate | default_pagination }}{%- endpaginate -%}
+  </div>
+</section>

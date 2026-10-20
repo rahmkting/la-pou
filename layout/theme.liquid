@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#9c3c54">
+<link rel="canonical" href="{{ canonical_url }}">
+{%- if settings.favicon != blank -%}
+  <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 64 }}">
+{%- endif -%}
+<title>{{ page_title }}{% unless page_title contains shop.name %} &middot; {{ shop.name }}{% endunless %}</title>
+{%- if page_description -%}
+  <meta name="description" content="{{ page_description | escape }}">
+{%- endif -%}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..600&family=Nunito+Sans:ital,opsz,wght@0,6..12,300..800;1,6..12,300..600&display=swap" rel="stylesheet">
+{{ 'theme.css' | asset_url | stylesheet_tag }}
+{{ content_for_header }}
+</head>
+<body class="t-{{ template.name }}">
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker__track">
+    <span>Free shipping on every order</span><i>&bull;</i>
+    <span>30 day love your skin guarantee</span><i>&bull;</i>
+    <span>5% PDRN, printed on the tube</span><i>&bull;</i>
+    <span>Delivery in 6 to 12 working days</span><i>&bull;</i>
+    <span>Free shipping on every order</span><i>&bull;</i>
+    <span>30 day love your skin guarantee</span><i>&bull;</i>
+    <span>5% PDRN, printed on the tube</span><i>&bull;</i>
+    <span>Delivery in 6 to 12 working days</span><i>&bull;</i>
+  </div>
+</div>
+
+<header class="head">
+  <div class="wrap head__in">
+    <a class="brand" href="#top" aria-label="La Peau Rosée, home">
+      <img src="{{ 'logo.webp' | asset_url }}" alt="La Peau Rosée" width="1000" height="246">
+    </a>
+    <nav class="menu" aria-label="Main">
+      <a href="#benefits">Benefits</a>
+      <a href="#actives">Actives</a>
+      <a href="#weeks">What to expect</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <a class="btn btn--fill btn--sm" href="{{ routes.root_url }}#pricing">Shop</a>
+  </div>
+</header>
+
+<main id="main">
+{{ content_for_layout }}
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <img class="foot__logo" src="{{ 'logo-white.webp' | asset_url }}" alt="La Peau Rosée" width="893" height="183">
+    <p class="foot__legal">These statements describe cosmetic effects on the appearance of skin. This product is not intended to diagnose, treat, cure or prevent any disease. Consult your physician before use if you are pregnant, nursing, have a known sensitivity, or have a fish or salmon allergy, since PDRN is salmon derived. Individual results vary. Percentages are as included in the formula and appear on every carton.</p>
+    <nav class="foot__nav" aria-label="Footer">
+      <a href="{{ routes.root_url }}#actives">Actives</a>
+      <a href="{{ routes.root_url }}#faq">FAQ</a>
+      {% if shop.shipping_policy %}<a href="{{ shop.shipping_policy.url }}">Shipping</a>{% endif %}
+      {% if shop.refund_policy %}<a href="{{ shop.refund_policy.url }}">Returns</a>{% endif %}
+      <a href="{{ routes.root_url }}pages/contact">Contact</a>
+    </nav>
+    <p class="foot__fine">&copy; {{ "now" | date: "%Y" }} {{ shop.name }}</p>
+  </div>
+</footer>
+
+<div class="sticky" data-sticky>
+  <span class="sticky__name">Multi Balm &middot; three sticks</span>
+  <button class="btn btn--fill btn--sm" type="button" data-atc-mini>Add to bag &middot; $89.99</button>
+</div>
+
+<script src="{{ 'theme.js' | asset_url }}" defer></script>
+</body>
+</html>

@@ -1,0 +1,707 @@
+{%- liquid
+  assign p1 = section.settings.product_single
+  assign p3 = section.settings.product_three
+  assign p6 = section.settings.product_six
+  assign v1 = p1.variants.first
+  assign v3 = p3.variants.first
+  assign v6 = p6.variants.first
+  assign wired = false
+  if v1 != blank and v3 != blank and v6 != blank
+    assign wired = true
+  endif
+-%}
+<!-- ============ 1. product hero ============ -->
+<section class="pdp" id="buy">
+  <div class="wrap pdp__grid">
+
+    <!-- gallery -->
+    <div class="gal">
+      <div class="gal__stage">
+        <button class="gal__arrow gal__arrow--prev" type="button" data-gal="-1" aria-label="Previous image">&#8249;</button>
+        <button class="gal__arrow gal__arrow--next" type="button" data-gal="1" aria-label="Next image">&#8250;</button>
+        <ul class="gal__reel" data-gal-reel>
+
+          <li class="gal__slide is-on">
+            <img src="{{ 'balm-box.webp' | asset_url }}" alt="One PDRN Pink Collagen Volume Multi Balm beside its carton" width="1024" height="1024">
+          </li>
+
+          <li class="gal__slide">
+            <img src="{{ 'sticks-three.webp' | asset_url }}" alt="Three multi balm sticks standing together" width="819" height="1024">
+          </li>
+
+          <li class="gal__slide">
+            <img src="{{ 'balm-group.webp' | asset_url }}" alt="A group of multi balm sticks on a warm taupe backdrop" width="1024" height="1024">
+          </li>
+
+          <li class="gal__slide">
+            <img src="{{ 'application-closeup.webp' | asset_url }}" alt="A woman gliding the pink multi balm along her cheekbone, the balm visible on the skin" width="537" height="672">
+          </li>
+
+          <li class="gal__slide">
+            <img src="{{ 'benefits-chart.webp' | asset_url }}" alt="Chart of the balm's six benefits: deep hydration, smoothing fine lines, PDRN renewal, barrier support, multi area care, and portability" width="1024" height="1280">
+          </li>
+
+        </ul>
+      </div>
+      <ol class="gal__dots" data-gal-dots aria-label="Choose an image"></ol>
+    </div>
+
+    <!-- buy column -->
+    <div class="pdp__info">
+      <p class="kicker">N&deg; 1 &middot; The Pink Balm</p>
+      <h1 class="pdp__title">The balm that goes<br>where cream won't.</h1>
+      <p class="pdp__lede">Built for women who are done with a seven step routine. This is one step, and it takes eleven seconds.</p>
+
+      <div class="rating">
+        <span class="rating__stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+        <span class="rating__note">Review widget &middot; pending first verified buyers</span>
+      </div>
+
+      <ul class="chips">
+        <li class="chip">Fine lines</li>
+        <li class="chip">Eye area</li>
+        <li class="chip">Smile lines</li>
+        <li class="chip chip--alt">Neck &amp; d&eacute;collet&eacute;</li>
+        <li class="chip chip--alt">Lip barrier</li>
+      </ul>
+
+      <div class="panel" id="pricing">
+        <p class="panel__head">PDRN Pink Collagen Volume Multi Balm &middot; 10 g &middot; About 45 days</p>
+
+        <ul class="ticks">
+          <li>5% PDRN, printed on the tube, not hidden inside a blend</li>
+          <li>Glides straight over makeup. No fingers, no mess, no waiting</li>
+          <li>One stick for the eye area, smile lines, neck and lips</li>
+          <li>Full ingredient list and batch number on every carton</li>
+          <li>30 days from delivery to change your mind, used or not</li>
+        </ul>
+
+        <div class="tiers" role="radiogroup" aria-label="Choose your quantity">
+
+          <label class="tier">
+            <input type="radio" name="qty" value="1" data-slide="0"
+              {% if v1 %}data-variant="{{ v1.id }}" data-money="{{ v1.price | money }}"{% else %}data-money="$34.99"{% endif %}>
+            <span class="tier__body">
+              <span class="tier__name">One stick</span>
+              <span class="tier__sub">Try it on one side of your face first</span>
+              <span class="tier__fine">Free shipping &middot; 6 to 12 working days</span>
+            </span>
+            <span class="tier__cost">
+              <b>{% if v1 %}{{ v1.price | money }}{% else %}$34.99{% endif %}</b>
+              {%- if v1.compare_at_price > v1.price %}<s>{{ v1.compare_at_price | money }}</s>
+              {%- elsif v1 == blank %}<s>$39.99</s>{% endif -%}
+            </span>
+          </label>
+
+          <label class="tier is-picked">
+            <input type="radio" name="qty" value="3" data-slide="1" checked
+              {% if v3 %}data-variant="{{ v3.id }}" data-money="{{ v3.price | money }}"{% else %}data-money="$89.99"{% endif %}>
+            <span class="tier__flag">Most loved</span>
+            {%- if v3.compare_at_price > v3.price %}
+            <span class="tier__save">Save {{ v3.compare_at_price | minus: v3.price | money }}</span>
+            {%- elsif v3 == blank %}<span class="tier__save">Save $13.00</span>{% endif %}
+            <span class="tier__body">
+              <span class="tier__name">Three sticks</span>
+              <span class="tier__sub">Bag, bathroom, bedside. Where the habit actually sticks</span>
+              <span class="tier__fine">{% if v3 %}{{ v3.price | divided_by: 3.0 | round | money }}{% else %}$30.00{% endif %} each &middot; free shipping &middot; 6 to 12 working days</span>
+            </span>
+            <span class="tier__cost">
+              <b>{% if v3 %}{{ v3.price | money }}{% else %}$89.99{% endif %}</b>
+              {%- if v3.compare_at_price > v3.price %}<s>{{ v3.compare_at_price | money }}</s>
+              {%- elsif v3 == blank %}<s>$102.99</s>{% endif -%}
+            </span>
+          </label>
+
+          <label class="tier">
+            <input type="radio" name="qty" value="6" data-slide="2"
+              {% if v6 %}data-variant="{{ v6.id }}" data-money="{{ v6.price | money }}"{% else %}data-money="$159.99"{% endif %}>
+            {%- if v6.compare_at_price > v6.price %}
+            <span class="tier__save">Save {{ v6.compare_at_price | minus: v6.price | money }}</span>
+            {%- elsif v6 == blank %}<span class="tier__save">Save $45.00</span>{% endif %}
+            <span class="tier__body">
+              <span class="tier__name">Six sticks</span>
+              <span class="tier__sub">Nine months of it, bought once</span>
+              <span class="tier__fine">{% if v6 %}{{ v6.price | divided_by: 6.0 | round | money }}{% else %}$26.67{% endif %} each &middot; free shipping &middot; 6 to 12 working days</span>
+            </span>
+            <span class="tier__cost">
+              <b>{% if v6 %}{{ v6.price | money }}{% else %}$159.99{% endif %}</b>
+              {%- if v6.compare_at_price > v6.price %}<s>{{ v6.compare_at_price | money }}</s>
+              {%- elsif v6 == blank %}<s>$204.99</s>{% endif -%}
+            </span>
+          </label>
+
+        </div>
+
+        <button class="btn btn--fill btn--wide" type="button" data-atc>Add to bag &middot; {% if v3 %}{{ v3.price | money }}{% else %}$89.99{% endif %}</button>
+        {%- if request.design_mode and wired == false %}
+        <p class="fine" style="color:var(--wine)">Pick a product for each bundle in this section's settings to turn on checkout.</p>
+        {%- endif %}
+
+        <ul class="assure">
+          <li><span class="assure__ico" aria-hidden="true">&#10003;</span>30 day guarantee</li>
+          <li><span class="assure__ico" aria-hidden="true">&#10003;</span>Free shipping</li>
+          <li><span class="assure__ico" aria-hidden="true">&#10003;</span>6 to 12 working days</li>
+        </ul>
+      </div>
+
+      <div class="acc" id="details">
+        <details class="acc__item">
+          <summary>The full ingredient list</summary>
+          <div class="acc__body">
+            <p>Every ingredient, in order, at the strength we use it. Nothing is grouped under a proprietary name.</p>
+            <p><b>Sodium DNA (PDRN) 5%</b>, Hydrogenated Polyisobutene, Hydrolyzed Collagen, Sodium Hyaluronate, Niacinamide 2%, Ceramide NP, Panthenol, Squalane, Shea Butter, Candelilla Wax, Tocopherol, Rosa Damascena Flower Extract, Mica, CI 77491.</p>
+            <p class="fine">The pink is mica and iron oxide. It sheers out clear on skin and leaves no colour behind.</p>
+          </div>
+        </details>
+        <details class="acc__item">
+          <summary>How to use it</summary>
+          <div class="acc__body">
+            <p>Morning or night, on clean or made up skin. Twist up two millimetres, no more. Glide once under each eye, once along each smile line, once up the neck. Press in with two fingers for five seconds.</p>
+            <p>It layers over serum and under sunscreen, and it will not pill under foundation as long as you press rather than rub.</p>
+          </div>
+        </details>
+        <details class="acc__item">
+          <summary>Why PDRN, and not another peptide</summary>
+          <div class="acc__body">
+            <p>PDRN is a fragment of DNA taken from salmon milt. In Korea it has been used in clinics for years, and it has spent the last two of them moving into topicals. It is included here at 5%, which is the upper end of what a balm base can carry while staying stable.</p>
+            <p>Peptides are not the enemy. We use collagen and niacinamide alongside it. PDRN is simply the one we built the formula around, and we would rather say that plainly than call it a complex.</p>
+          </div>
+        </details>
+        <details class="acc__item">
+          <summary>Who this is not for</summary>
+          <div class="acc__body">
+            <p>If you have a salmon or fish allergy, skip it. PDRN is salmon derived and we will not tell you the amount is too small to matter.</p>
+            <p>If you are on prescription retinoids or mid course with a dermatologist, ask them first. If you want an overnight change, this is not it, and no balm is.</p>
+          </div>
+        </details>
+        <details class="acc__item">
+          <summary>Shipping, returns and the guarantee</summary>
+          <div class="acc__body">
+            <p>Shipping is free on every order, with no minimum. Delivery takes 6 to 12 working days.</p>
+            <p>Returns run on the same clock as the guarantee: 30 days from the day your order arrives, so time in transit does not count against you. Inside that window, used or unused, email us and we refund it in full. After 30 days from delivery the order is no longer eligible, so if you are unsure, start the conversation early rather than late.</p>
+          </div>
+        </details>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. stats ============ -->
+<section class="stats">
+  <div class="wrap stats__in">
+    <div class="stat"><span class="stat__n">5%</span><span class="stat__l">PDRN, on the tube</span></div>
+    <div class="stat"><span class="stat__n">4</span><span class="stat__l">Areas, one stick</span></div>
+    <div class="stat"><span class="stat__n">11 sec</span><span class="stat__l">The whole routine</span></div>
+    <div class="stat"><span class="stat__n">30</span><span class="stat__l">Day guarantee</span></div>
+  </div>
+</section>
+
+<!-- ============ 3. story ============ -->
+<section class="story">
+  <div class="wrap story__grid">
+    <div class="story__shot">
+      <img src="{{ 'hero-lifestyle.webp' | asset_url }}" alt="A woman holding the pink multi balm stick against her cheek" width="1584" height="672">
+    </div>
+    <div class="story__text">
+      <p class="kicker">Why we made this</p>
+      <h2 class="h2">You were told to <em>start earlier</em>. Nobody said what to do now.</h2>
+      <p>Every counter in the country will sell a woman in her forties a jar. Fifty millilitres, a name in French, a number on the front that means nothing. You take it home, you use it for three weeks, and the honest answer is that you cannot tell.</p>
+      <p>So we went the other way. One format you will actually reach for, one active at a strength worth printing, and the whole list on the box where a person can read it without a magnifier.</p>
+      <p>It is a balm because a balm survives a handbag. It is pink because the PDRN is, and we saw no reason to bleach it white and charge more for the privilege.</p>
+      <a class="btn btn--fill" href="#pricing">Shop the balm &middot; $34.99</a>
+      <p class="fine">Free shipping. 30 day guarantee.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. benefits ============ -->
+<section class="benefits" id="benefits">
+  <div class="wrap">
+    <p class="kicker center">What it does</p>
+    <h2 class="h2 center">Four things women actually<br>come to us for.</h2>
+    <p class="lede center">Not a claim about your biology. A description of what the actives are known to support, and what women in them tell us they notice.</p>
+
+    <ul class="quad">
+      <li class="qcard">
+        <span class="qcard__tag">Eyes</span>
+        <h3 class="qcard__h">Crepe that catches the light</h3>
+        <p>The thin skin under the eye is where dryness reads as age first. PDRN and hyaluronic acid hold water there, and the balm base stops it leaving.</p>
+        <p class="qcard__fine">Supports the look of a smoother, better hydrated eye area.</p>
+      </li>
+      <li class="qcard">
+        <span class="qcard__tag">Smile lines</span>
+        <h3 class="qcard__h">The two you notice on video calls</h3>
+        <p>Nasolabial folds are structural and no cream removes them. Softened and light reflecting is a different thing, and that part is achievable.</p>
+        <p class="qcard__fine">Supports the appearance of softer, less shadowed folds.</p>
+      </li>
+      <li class="qcard">
+        <span class="qcard__tag">Neck</span>
+        <h3 class="qcard__h">The bit everyone forgets</h3>
+        <p>Most women stop at the jaw because reaching for a second product is one step too many. A stick removes the excuse. Three upward passes.</p>
+        <p class="qcard__fine">Supports hydration and barrier comfort on the neck and chest.</p>
+      </li>
+      <li class="qcard">
+        <span class="qcard__tag">Lips</span>
+        <h3 class="qcard__h">Not a lip balm, but it works</h3>
+        <p>Same stick, straight across the lip line, where lipstick has started to travel. Ceramide and squalane do the sealing.</p>
+        <p class="qcard__fine">Supports a smoother lip border and comfortable, conditioned lips.</p>
+      </li>
+    </ul>
+
+    <div class="center"><a class="btn btn--fill" href="#buy">Start with three sticks &middot; $89.99</a>
+    <p class="fine">Free shipping. 30 day guarantee.</p></div>
+  </div>
+</section>
+
+<!-- ============ 5. actives ============ -->
+<section class="actives" id="actives">
+  <div class="wrap">
+    <div class="center">
+      <p class="kicker">The formula</p>
+      <h2 class="h2">Two came from the sea.<br>Three came from a lab.</h2>
+      <p class="lede center">Five actives, each at a strength we will print. Here is where every one of them sits in the stick.</p>
+    </div>
+
+    <div class="diagram" id="diagram">
+      <svg class="wires" id="wires" aria-hidden="true"></svg>
+
+      <div class="side left">
+        <article class="call" data-dot="d1">
+          <p class="call__origin">Sea &middot; Hokkaido, Japan</p>
+          <div class="call__top"><h3 class="call__name">PDRN</h3><span class="call__dose">5%</span></div>
+          <p class="call__latin">Sodium DNA</p>
+          <p class="call__copy">Short strands of DNA from salmon milt. The active the whole stick is built around, at the highest level a balm base holds.</p>
+        </article>
+
+        <article class="call" data-dot="d2">
+          <p class="call__origin">Sea &middot; North Atlantic</p>
+          <div class="call__top"><h3 class="call__name">Marine collagen</h3><span class="call__dose">2%</span></div>
+          <p class="call__latin">Hydrolyzed collagen</p>
+          <p class="call__copy">Broken down small enough to sit in the surface layers rather than on top of them. A humectant and a film former.</p>
+        </article>
+
+        <article class="call" data-dot="d3">
+          <p class="call__origin">Lab &middot; Fermented, Korea</p>
+          <div class="call__top"><h3 class="call__name">Hyaluronic acid</h3><span class="call__dose">1%</span></div>
+          <p class="call__latin">Sodium hyaluronate</p>
+          <p class="call__copy">Low weight, so it sits in the skin instead of drying into a tight film on it. Fermented from wheat, never from rooster combs.</p>
+        </article>
+      </div>
+
+      <figure class="stage" id="stage">
+        <img src="{{ 'stick-cutout.webp' | asset_url }}" alt="The PDRN Pink Collagen Volume Multi Balm stick" width="186" height="698">
+        <span class="dot" data-id="d1" style="--x:26%;--y:7%"></span>
+        <span class="dot" data-id="d2" style="--x:17%;--y:28%"></span>
+        <span class="dot" data-id="d3" style="--x:15%;--y:54%"></span>
+        <span class="dot" data-id="d4" style="--x:84%;--y:38%"></span>
+        <span class="dot" data-id="d5" style="--x:81%;--y:74%"></span>
+        <figcaption>10 g &middot; 45 days of use</figcaption>
+      </figure>
+
+      <div class="side right">
+        <article class="call" data-dot="d4">
+          <p class="call__origin">Lab &middot; Basel, Switzerland</p>
+          <div class="call__top"><h3 class="call__name">Niacinamide</h3><span class="call__dose">2%</span></div>
+          <p class="call__latin">Vitamin B3</p>
+          <p class="call__copy">Two percent, not ten. The high dose versions are what make people sting and go red, and the tone benefits show up at this level anyway.</p>
+        </article>
+
+        <article class="call" data-dot="d5">
+          <p class="call__origin">Lab &middot; Fermented, Korea</p>
+          <div class="call__top"><h3 class="call__name">Ceramide NP</h3><span class="call__dose">0.5%</span></div>
+          <p class="call__latin">Ceramide 3</p>
+          <p class="call__copy">The lid on the jar. Without it the water the other four pull in leaves again by lunchtime.</p>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. timeline ============ -->
+<section class="weeks" id="weeks">
+  <div class="wrap">
+    <p class="kicker center">What to expect</p>
+    <h2 class="h2 center">Your first eight weeks.</h2>
+    <p class="lede center">A balm is not an injection. Here is the honest version of what happens, and roughly when.</p>
+
+    <ul class="week3">
+      <li class="wcard">
+        <p class="wcard__when">Week one &middot; Days 1 to 7</p>
+        <h3 class="wcard__h">It feels like something</h3>
+        <p>Cushion under the eye within about a minute, and it is still there when you wash your face at night. This part is the hyaluronic acid and the balm base, and it is the fastest thing the stick does.</p>
+      </li>
+      <li class="wcard">
+        <p class="wcard__when">Weeks two to four</p>
+        <h3 class="wcard__h">Makeup stops settling</h3>
+        <p>The tell most women report first is not the mirror, it is concealer. It stops sinking into the lines under the eye by mid afternoon. Nothing has changed structurally. The surface is simply holding water.</p>
+      </li>
+      <li class="wcard">
+        <p class="wcard__when">Weeks five to eight</p>
+        <h3 class="wcard__h">Photographs change first</h3>
+        <p>Softer, less shadowed, is what you are looking for, and it shows up in pictures before it shows up in the bathroom mirror. Take one now, at the same window, and compare at week eight.</p>
+      </li>
+    </ul>
+
+    <div class="center"><a class="btn btn--fill" href="#buy">Take the eight weeks &middot; $89.99</a>
+    <p class="fine">Three sticks. Free shipping. 30 day guarantee.</p></div>
+  </div>
+</section>
+
+<!-- ============ 7. five reasons ============ -->
+<section class="five">
+  <div class="wrap">
+    <p class="kicker">Five reasons</p>
+    <h2 class="h2">Why this isn't the last<br>pink tube you tried.</h2>
+
+    <ol class="rlist">
+      <li class="row">
+        <span class="row__n">01</span>
+        <div>
+          <h3 class="row__h">The percentage is on the outside</h3>
+          <p>Five percent PDRN, in type you can read, on the carton and the tube. If a brand will not print the number, the number is small. That is the whole trick and it is not a subtle one.</p>
+        </div>
+      </li>
+      <li class="row">
+        <span class="row__n">02</span>
+        <div>
+          <h3 class="row__h">One step, or you will not do it</h3>
+          <p>The best formula in the world loses to the one you actually use. We built a stick because eleven seconds is a habit and four minutes is a resolution.</p>
+        </div>
+      </li>
+      <li class="row">
+        <span class="row__n">03</span>
+        <div>
+          <h3 class="row__h">A batch number that goes somewhere</h3>
+          <p>Type the number on your carton into the site and you get the certificate for your stick. Fill date, actives, stability, the lot. Not a generic PDF for the product line.</p>
+        </div>
+      </li>
+      <li class="row">
+        <span class="row__n">04</span>
+        <div>
+          <h3 class="row__h">One stick, four places</h3>
+          <p>The eye area, the smile lines, the neck and the lip border, out of a single tube. Most routines ask you to buy three products for that, in three formats, at three price points.</p>
+        </div>
+      </li>
+      <li class="row">
+        <span class="row__n">05</span>
+        <div>
+          <h3 class="row__h">We will tell you when it is not for you</h3>
+          <p>Fish allergy, on a retinoid course, or looking for a result in a week. Our goal is to have you looking the best you have ever looked, and that means pointing you somewhere else when this is not the thing that gets you there.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============ 8. comparison ============ -->
+<section class="versus">
+  <div class="wrap">
+    <p class="kicker">The other side</p>
+    <h2 class="h2">Us, and the tube next to us.</h2>
+    <p class="lede">Most of this category is a white label stick bought by the case with a logo added. Here is where the difference sits.</p>
+
+    <table class="vs">
+      <thead>
+        <tr>
+          <th scope="col"><span class="sr-only">Feature</span></th>
+          <th scope="col">La Peau Ros&eacute;e</th>
+          <th scope="col">Typical pink balm</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">PDRN percentage stated on pack</th><td class="y">&#10003;</td><td class="n">&#10007;</td></tr>
+        <tr><th scope="row">Every active listed with its own number</th><td class="y">&#10003;</td><td class="n">&#10007;</td></tr>
+        <tr><th scope="row">Batch certificate you can look up</th><td class="y">&#10003;</td><td class="n">&#10007;</td></tr>
+        <tr><th scope="row">One stick covering four areas</th><td class="y">&#10003;</td><td class="n">&#10007;</td></tr>
+        <tr><th scope="row">Ceramide to hold the hydration in</th><td class="y">&#10003;</td><td class="n">&#10007;</td></tr>
+        <tr><th scope="row">Hidden behind a proprietary complex</th><td class="n">&#10007;</td><td class="y">&#10003;</td></tr>
+      </tbody>
+    </table>
+
+    <a class="btn btn--fill" href="#pricing">Shop the balm &middot; $34.99</a>
+    <p class="fine">30 day guarantee. Free shipping.</p>
+  </div>
+</section>
+
+<!-- ============ 9. guarantee ============ -->
+<section class="promise">
+  <div class="wrap promise__in">
+    <div class="seal"><span class="seal__n">30</span><span class="seal__l">day guarantee</span></div>
+    <div>
+      <p class="kicker">Our promise</p>
+      <h2 class="h2">Thirty days,<br>from the day it arrives.</h2>
+      <p>The clock starts the day the parcel reaches you, not the day it leaves us, so the 6 to 12 working days in transit are ours to absorb rather than yours. That gives you a full month with the stick in hand.</p>
+      <p>A month is long enough to reach the change most women notice first, which is concealer sitting better rather than anything in the mirror. It is not the full eight weeks the balm needs to show up in photographs, and we would rather say so than let you find out afterwards. If it is not earning its place, email us before the thirty days are up and we refund the order in full. No forms, no return label, no questions.</p>
+      <p>Keep the stick either way, or pass it to a friend. We would rather you decided for yourself than spent a year wondering.</p>
+      <a class="btn btn--fill" href="#pricing">Start with one stick &middot; $34.99</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10. the rest of the line ============ -->
+<section class="line">
+  <div class="wrap">
+    <p class="kicker center">The rest of the line</p>
+    <h2 class="h2 center">When one step<br>becomes three.</h2>
+    <p class="lede center">The balm is where to start. These two are for the evening, and for the women who tell us they want more than eleven seconds.</p>
+
+    <ul class="trio">
+      <li class="tcard">
+        <div class="tcard__shot"><img src="{{ 'balm-box.webp' | asset_url }}" alt="One multi balm stick beside its carton" width="1024" height="1024"></div>
+        <p class="tcard__step">Step one &middot; Morning</p>
+        <h3 class="tcard__h">Multi Balm</h3>
+        <p>5% PDRN. Eye area, smile lines, neck, lips. Over makeup, in eleven seconds.</p>
+        <p class="tcard__price">$34.99 &middot; 10 g</p>
+        <a class="btn btn--line btn--sm" href="#buy">Add to bag</a>
+      </li>
+      <li class="tcard">
+        <div class="tcard__shot"><img src="{{ 'ampoule-single.webp' | asset_url }}" alt="One Stem Cell Ampoule bottle" width="919" height="1152"></div>
+        <p class="tcard__step">Step two &middot; Evening</p>
+        <h3 class="tcard__h">Stem Cell Ampoule</h3>
+        <p>The concentrated version. Four drops on damp skin before anything else goes on.</p>
+        <p class="tcard__price">$30 &middot; 30 ml</p>
+        <a class="btn btn--line btn--sm" href="#buy">Join the waitlist</a>
+      </li>
+      <li class="tcard">
+        <div class="tcard__shot"><img src="{{ 'cream-jar.webp' | asset_url }}" alt="Collagen Renewal Anti-Aging Cream jar" width="1000" height="844"></div>
+        <p class="tcard__step">Step three &middot; Evening</p>
+        <h3 class="tcard__h">Collagen Renewal Cream</h3>
+        <p>Pink capsules that break under your fingers. Hyaluronic acid, niacinamide, collagen.</p>
+        <p class="tcard__price">$62 &middot; 50 ml</p>
+        <a class="btn btn--line btn--sm" href="#buy">Join the waitlist</a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 11. faq ============ -->
+<section class="faq" id="faq">
+  <div class="wrap faq__grid">
+
+    <aside class="faq__aside">
+      <p class="kicker">Questions</p>
+      <h2 class="h2">Before you<br>add it to the bag.</h2>
+      <p class="faq__note">The ones women actually email us, answered the way we would answer them in person.</p>
+      <div class="faq__card">
+        <p class="faq__card-h">Not covered here?</p>
+        <p>Write to <a href="mailto:hello@lapeaurosee.com">hello@lapeaurosee.com</a> and a person replies, usually the same day. Our goal is to have you looking the best you have ever looked, so ask us anything before you buy.</p>
+      </div>
+    </aside>
+
+    <div class="faq__list">
+
+      <details class="qa" open>
+        <summary>How long until I see anything?</summary>
+        <div class="qa__body">
+          <p>Cushion and comfort within a minute, on day one. That part is the balm base and the hyaluronic acid, and it is immediate.</p>
+          <p>The change most women notice first arrives around week three, and it is usually concealer sitting better rather than anything in the mirror. Softer and less shadowed shows up in photographs by week eight. If you want a result in seven days, this is not it, and neither is anything else in a tube.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>Can I use it with retinol or tretinoin?</summary>
+        <div class="qa__body">
+          <p>Yes, and plenty of women use it precisely because they are on one. Apply the retinoid first, let it dry, then glide the balm over the top. The ceramide and squalane help with the flaking and tightness that come with the first few months.</p>
+          <p>If you are mid course with a dermatologist, ask them before adding anything. They know your skin and we do not.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>Is it safe in pregnancy or while nursing?</summary>
+        <div class="qa__body">
+          <p>Nothing in the formula sits on the standard avoid list. No retinoids and no salicylic acid. That said, we are not the ones who should tell you it is fine. Show the ingredient list to your midwife or doctor and let them make the call.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>I have a fish allergy. Can I use it?</summary>
+        <div class="qa__body">
+          <p>No. PDRN is derived from salmon milt, and we will not tell you the amount is too small to matter. Skip this one.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>Will it pill under makeup?</summary>
+        <div class="qa__body">
+          <p>Not if you press instead of rub. Twist up no more than two millimetres, glide it on, then press it in with two fingers for about five seconds. Rubbing is what rolls a balm into little beads, and that is true of every balm, not only this one.</p>
+          <p>It also goes on over finished makeup, which is why most people keep one in a bag rather than a bathroom.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>Is the pink going to show on my skin?</summary>
+        <div class="qa__body">
+          <p>No. The colour is mica and iron oxide, and it sheers out completely as you press it in. No tint, no shimmer, no cast, including on deeper skin tones. The stick is pink because the PDRN is, and we saw no reason to bleach it.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>How long does one stick last?</summary>
+        <div class="qa__body">
+          <p>About forty five days used once daily across the eye area, smile lines, neck and lips. Twice a day brings that closer to three weeks. Ten grams goes further than it looks, because a stick lays down a far thinner layer than fingers do.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>Why PDRN, and why only 5%?</summary>
+        <div class="qa__body">
+          <p>Five percent is the upper end of what a balm base carries while staying smooth. Push past it and the stick turns grainy and drags, which is why most brands quietly use far less and never print the number.</p>
+          <p>Peptides are not the enemy, and we use collagen and niacinamide alongside it. PDRN is simply what the formula is built around, and we would rather say that plainly than call it a complex.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>What does the batch number get me?</summary>
+        <div class="qa__body">
+          <p>Type the number printed on your carton into the site and you get the certificate for your specific stick. Fill date, actives at their measured levels, stability results. Not a generic PDF written once for the whole product line.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>Shipping, returns and the guarantee</summary>
+        <div class="qa__body">
+          <p>Shipping is free on every order, with no minimum. Delivery takes 6 to 12 working days.</p>
+          <p>Returns run on the same clock as the guarantee: 30 days from the day your order arrives, so time in transit does not count against you. Inside that window, used or unused, email us and we refund it in full. After 30 days from delivery the order is no longer eligible, so if you are unsure, start the conversation early rather than late.</p>
+        </div>
+      </details>
+
+      <details class="qa">
+        <summary>Is it tested on animals? Where is it made?</summary>
+        <div class="qa__body">
+          <p>No animal testing, and we do not sell anywhere that requires it. Formulated and filled in South Korea, in a facility that has been making PDRN topicals since well before the ingredient reached the West.</p>
+        </div>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ 12. closer ============ -->
+<section class="closer">
+  <div class="wrap closer__grid">
+    <div class="closer__text">
+      <p class="kicker">N&deg; 1 &middot; The Pink Balm</p>
+      <h2 class="h2">It is called La Peau<br>Ros&eacute;e for a reason.</h2>
+      <p>Rosy skin is the oldest description of a face that is looking after itself, and it is still the only one anybody actually wants. Not lifted, not corrected, not ten years younger. Start with one stick. Thirty four ninety nine, free shipping, and thirty days from the day it arrives to decide it was worth it.</p>
+      <a class="btn btn--fill" href="#buy">Start with three sticks &middot; $89.99</a>
+      <p class="fine">Free shipping. 30 day guarantee.</p>
+    </div>
+    <figure class="closer__shot">
+      <img src="{{ 'ba-before.webp' | asset_url }}" alt="A woman resting her hand against her cheek, bare skin" width="726" height="531">
+      <img src="{{ 'ba-after.webp' | asset_url }}" alt="The same woman holding the pink multi balm to her cheek" width="726" height="531">
+    </figure>
+  </div>
+</section>
+
+<script type="application/ld+json"><script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How long until I see anything?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Cushion and comfort within a minute, on day one. That part is the balm base and the hyaluronic acid, and it is immediate. The change most women notice first arrives around week three, and it is usually concealer sitting better rather than anything in the mirror. Softer and less shadowed shows up in photographs by week eight. If you want a result in seven days, this is not it, and neither is anything else in a tube."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use it with retinol or tretinoin?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, and plenty of women use it precisely because they are on one. Apply the retinoid first, let it dry, then glide the balm over the top. The ceramide and squalane help with the flaking and tightness that come with the first few months. If you are mid course with a dermatologist, ask them before adding anything. They know your skin and we do not."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is it safe in pregnancy or while nursing?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nothing in the formula sits on the standard avoid list. No retinoids and no salicylic acid. That said, we are not the ones who should tell you it is fine. Show the ingredient list to your midwife or doctor and let them make the call."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "I have a fish allergy. Can I use it?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. PDRN is derived from salmon milt, and we will not tell you the amount is too small to matter. Skip this one."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will it pill under makeup?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Not if you press instead of rub. Twist up no more than two millimetres, glide it on, then press it in with two fingers for about five seconds. Rubbing is what rolls a balm into little beads, and that is true of every balm, not only this one. It also goes on over finished makeup, which is why most people keep one in a bag rather than a bathroom."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the pink going to show on my skin?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The colour is mica and iron oxide, and it sheers out completely as you press it in. No tint, no shimmer, no cast, including on deeper skin tones. The stick is pink because the PDRN is, and we saw no reason to bleach it."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How long does one stick last?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "About forty five days used once daily across the eye area, smile lines, neck and lips. Twice a day brings that closer to three weeks. Ten grams goes further than it looks, because a stick lays down a far thinner layer than fingers do."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why PDRN, and why only 5%?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Five percent is the upper end of what a balm base carries while staying smooth. Push past it and the stick turns grainy and drags, which is why most brands quietly use far less and never print the number. Peptides are not the enemy, and we use collagen and niacinamide alongside it. PDRN is simply what the formula is built around, and we would rather say that plainly than call it a complex."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does the batch number get me?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Type the number printed on your carton into the site and you get the certificate for your specific stick. Fill date, actives at their measured levels, stability results. Not a generic PDF written once for the whole product line."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Shipping, returns and the guarantee",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Shipping is free on every order, with no minimum. Delivery takes 6 to 12 working days. Returns run on the same clock as the guarantee: 30 days from the day your order arrives, so time in transit does not count against you. Inside that window, used or unused, email us and we refund it in full. After 30 days from delivery the order is no longer eligible, so if you are unsure, start the conversation early rather than late."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is it tested on animals? Where is it made?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No animal testing, and we do not sell anywhere that requires it. Formulated and filled in South Korea, in a facility that has been making PDRN topicals since well before the ingredient reached the West."
+      }
+    }
+  ]
+}
+</script></script>
+
+{% schema %}
+{
+  "name": "Landing page",
+  "settings": [
+    { "type": "header", "content": "Bundles" },
+    { "type": "paragraph",
+      "content": "Choose the Shopify product behind each tier. Prices, compare-at prices and savings are read from the product, so the page and the cart can never disagree." },
+    { "type": "product", "id": "product_single", "label": "One stick" },
+    { "type": "product", "id": "product_three", "label": "Three sticks" },
+    { "type": "product", "id": "product_six", "label": "Six sticks" }
+  ],
+  "presets": [{ "name": "Landing page" }]
+}
+{% endschema %}
