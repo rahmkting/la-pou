@@ -213,9 +213,29 @@
       drawer.classList.toggle("is-busy", on);
     }
 
+    /* order protection rides along with the first add, once. A shopper who
+       removes it keeps it off for the rest of this visit. */
+    var PROTECT_OFF = "lpr-protection-off";
+    function protectionOff() {
+      try { return window.sessionStorage.getItem(PROTECT_OFF) === "1"; } catch (e) { return false; }
+    }
+    function withProtection(items) {
+      var pv = drawer.getAttribute("data-protect-variant");
+      if (!pv || body().getAttribute("data-protect-key") || protectionOff()) return items;
+      if (items.some(function (i) { return String(i.id) === pv; })) return items;
+      return items.concat([{ id: Number(pv), quantity: 1 }]);
+    }
+
     function add(id, qty) {
       setBusy(true);
-      return post("cart/add.js", { items: [{ id: Number(id), quantity: qty || 1 }] })
+      var items = [{ id: Number(id), quantity: qty || 1 }];
+      var full = withProtection(items);
+      return post("cart/add.js", { items: full })
+        .catch(function (e) {
+          /* never let the protection item block the product itself */
+          if (full.length > items.length) return post("cart/add.js", { items: items });
+          throw e;
+        })
         .then(function (j) { setBusy(false); open(); return j; }, function (e) { setBusy(false); throw e; });
     }
 
@@ -223,6 +243,13 @@
       if (busy) return;
       setBusy(true);
       post("cart/change.js", { id: key, quantity: Math.max(0, qty) })
+        .then(function () {
+          /* protection on its own protects nothing, so it leaves with the last product */
+          var b = body(), pk = b.getAttribute("data-protect-key");
+          if (pk && b.getAttribute("data-real-count") === "0") {
+            return post("cart/change.js", { id: pk, quantity: 0 });
+          }
+        })
         .catch(function (e) {
           window.alert((e && e.description) || "That change could not be saved. Please try again.");
         })
@@ -270,6 +297,9 @@
       }
 
       var line = t.closest("[data-line]");
+      if (line && line.hasAttribute("data-protect-drop")) {
+        try { window.sessionStorage.setItem(PROTECT_OFF, "1"); } catch (err) {}
+      }
       if (line) { change(line.getAttribute("data-line"), parseInt(line.getAttribute("data-qty"), 10)); return; }
 
       var up = t.closest("[data-upsell]");

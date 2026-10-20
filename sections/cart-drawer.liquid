@@ -5,6 +5,16 @@
 {%- endcomment -%}
 {%- liquid
   assign threshold = section.settings.free_shipping_threshold | times: 100
+  assign protect = section.settings.protection_product
+  assign protect_key = ''
+  assign real_count = 0
+  for item in cart.items
+    if protect != blank and item.product_id == protect.id
+      assign protect_key = item.key
+    else
+      assign real_count = real_count | plus: item.quantity
+    endif
+  endfor
   assign savings = cart.total_discount
   assign in_cart = ''
   for item in cart.items
@@ -16,10 +26,11 @@
     endif
   endfor
 -%}
-<div class="drawer" data-drawer data-section="{{ section.id }}" aria-hidden="true">
+<div class="drawer" data-drawer data-section="{{ section.id }}"
+  {%- if protect != blank and protect.available %} data-protect-variant="{{ protect.selected_or_first_available_variant.id }}"{% endif %} aria-hidden="true">
   <div class="drawer__veil" data-drawer-close></div>
   <aside class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="drawer-title" tabindex="-1">
-    <div class="drawer__body" data-drawer-body data-count="{{ cart.item_count }}">
+    <div class="drawer__body" data-drawer-body data-count="{{ cart.item_count }}" data-protect-key="{{ protect_key }}" data-real-count="{{ real_count }}">
 
       <header class="dr-head">
         <h2 class="dr-head__title" id="drawer-title">Cart <span>({{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }})</span></h2>
@@ -68,7 +79,9 @@
                   assign was = cmp_line
                 endif
               -%}
-              <li class="dr-line">
+              {%- assign is_protect = false -%}
+              {%- if protect != blank and item.product_id == protect.id -%}{%- assign is_protect = true -%}{%- endif -%}
+              <li class="dr-line{% if is_protect %} dr-line--protect{% endif %}">
                 <a class="dr-line__shot" href="{{ item.url }}" tabindex="-1">
                   {%- if item.image -%}
                     <img src="{{ item.image | image_url: width: 240 }}" alt="{{ item.image.alt | default: item.product.title | escape }}" width="120" height="120" loading="lazy">
@@ -81,16 +94,21 @@
                       <p class="dr-line__opt">{{ o.name }}: {{ o.value }}</p>
                     {%- endfor -%}
                   {%- endunless -%}
+                  {%- if is_protect and section.settings.protection_note != blank -%}
+                    <p class="dr-line__opt">{{ section.settings.protection_note }}</p>
+                  {%- endif -%}
                   {%- for d in item.line_level_discount_allocations -%}
                     <p class="dr-line__opt dr-line__opt--deal">{{ d.discount_application.title }} (&minus;{{ d.amount | money }})</p>
                   {%- endfor -%}
                   <div class="dr-line__ctrl">
+                    {%- unless is_protect -%}
                     <div class="dr-qty">
                       <button type="button" data-line="{{ item.key }}" data-qty="{{ item.quantity | minus: 1 }}" aria-label="One fewer {{ item.product.title | escape }}">&minus;</button>
                       <span aria-live="polite">{{ item.quantity }}</span>
                       <button type="button" data-line="{{ item.key }}" data-qty="{{ item.quantity | plus: 1 }}" aria-label="One more {{ item.product.title | escape }}">+</button>
                     </div>
-                    <button class="dr-line__drop" type="button" data-line="{{ item.key }}" data-qty="0">Remove</button>
+                    {%- endunless -%}
+                    <button class="dr-line__drop" type="button" data-line="{{ item.key }}" data-qty="0"{% if is_protect %} data-protect-drop{% endif %}>Remove</button>
                   </div>
                 </div>
                 <div class="dr-line__cost">
@@ -176,6 +194,10 @@
       "info": "Products already in the cart, or sold out, are skipped." },
     { "type": "text", "id": "upsell_heading", "label": "Heading", "default": "Complete your routine" },
     { "type": "text", "id": "upsell_subheading", "label": "Subheading", "default": "Added by women who bought the balm" },
+    { "type": "header", "content": "Order protection" },
+    { "type": "product", "id": "protection_product", "label": "Protection product",
+      "info": "Added once, automatically, with the first item a shopper puts in the cart. If they remove it, it stays off for the rest of their visit. Leave empty to turn this off." },
+    { "type": "text", "id": "protection_note", "label": "Line under the protection item", "default": "Covers loss, theft and damage in transit" },
     { "type": "header", "content": "Footer" },
     { "type": "checkbox", "id": "show_payment_icons", "label": "Show payment icons", "default": true },
     { "type": "text", "id": "footer_note", "label": "Note under checkout", "default": "Free shipping included. 30 day guarantee." }
