@@ -95,6 +95,15 @@
         return;
       }
       [atc, mini].forEach(function (b) { if (b) { b.disabled = true; } });
+      var done = function () { [atc, mini].forEach(function (b) { if (b) { b.disabled = false; } }); };
+      if (window.LPRCart) {
+        window.LPRCart.add(variant, 1).then(done, function (e) {
+          done();
+          window.alert((e && e.description) || "That bundle could not be added. It may be out of stock.");
+        });
+        return;
+      }
+      /* no drawer on this page (the cart page itself), so fall back to it */
       var root = (window.Shopify && window.Shopify.routes && window.Shopify.routes.root) || "/";
       fetch(root + "cart/add.js", {
         method: "POST",
@@ -107,7 +116,7 @@
         })
         .then(function () { window.location.href = root + "cart"; })
         .catch(function (e) {
-          [atc, mini].forEach(function (b) { if (b) { b.disabled = false; } });
+          done();
           window.alert((e && e.description) || "That bundle could not be added. It may be out of stock.");
         });
     }
@@ -116,6 +125,197 @@
     if (mini) mini.addEventListener("click", addToCart);
 
     paint();
+  }
+
+  /* ---------- slide out cart ---------- */
+  function cart() {
+    var drawer = document.querySelector("[data-drawer]");
+    if (!drawer) return;
+
+    var panel = drawer.querySelector(".drawer__panel");
+    var section = drawer.getAttribute("data-section");
+    var root = (window.Shopify && window.Shopify.routes && window.Shopify.routes.root) || "/";
+    var lastFocus = null;
+    var busy = false;
+
+    function body() { return drawer.querySelector("[data-drawer-body]"); }
+
+    function open() {
+      if (drawer.classList.contains("is-open")) return;
+      lastFocus = document.activeElement;
+      drawer.classList.add("is-open");
+      drawer.setAttribute("aria-hidden", "false");
+      document.documentElement.classList.add("is-locked");
+      timer();
+      window.setTimeout(function () { panel.focus(); }, 30);
+    }
+
+    function close() {
+      if (!drawer.classList.contains("is-open")) return;
+      drawer.classList.remove("is-open");
+      drawer.setAttribute("aria-hidden", "true");
+      document.documentElement.classList.remove("is-locked");
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    function paintCount() {
+      var n = body().getAttribute("data-count") || "0";
+      Array.prototype.forEach.call(document.querySelectorAll("[data-cart-count]"), function (el) {
+        el.textContent = n;
+        el.hidden = n === "0";
+      });
+    }
+
+    /* the server renders the drawer; swap in the fresh copy */
+    function swap(html) {
+      var fresh = new DOMParser().parseFromString(html, "text/html").querySelector("[data-drawer-body]");
+      if (!fresh) return;
+      var scroller = drawer.querySelector(".dr-scroll");
+      var top = scroller ? scroller.scrollTop : 0;
+      body().replaceWith(fresh);
+      var next = drawer.querySelector(".dr-scroll");
+      if (next) next.scrollTop = top;
+      paintCount();
+      timer();
+    }
+
+    function post(path, payload) {
+      payload.sections = section;
+      payload.sections_url = window.location.pathname;
+      return fetch(root + path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(payload)
+      })
+        .then(function (r) {
+          return r.json().then(function (j) {
+            if (!r.ok) throw j;
+            return j;
+          });
+        })
+        .then(function (j) {
+          if (j.sections && j.sections[section]) {
+            swap(j.sections[section]);
+            return j;
+          }
+          return refresh().then(function () { return j; });
+        });
+    }
+
+    function refresh() {
+      return fetch(root + "?sections=" + encodeURIComponent(section))
+        .then(function (r) { return r.json(); })
+        .then(function (j) { if (j[section]) swap(j[section]); });
+    }
+
+    function setBusy(on) {
+      busy = on;
+      drawer.classList.toggle("is-busy", on);
+    }
+
+    function add(id, qty) {
+      setBusy(true);
+      return post("cart/add.js", { items: [{ id: Number(id), quantity: qty || 1 }] })
+        .then(function (j) { setBusy(false); open(); return j; }, function (e) { setBusy(false); throw e; });
+    }
+
+    function change(key, qty) {
+      if (busy) return;
+      setBusy(true);
+      post("cart/change.js", { id: key, quantity: Math.max(0, qty) })
+        .catch(function (e) {
+          window.alert((e && e.description) || "That change could not be saved. Please try again.");
+        })
+        .then(function () { setBusy(false); });
+    }
+
+    /* reservation clock: starts the first time the cart is opened with
+       something in it, survives page loads in this tab, then hides */
+    var tick = null;
+    function timer() {
+      var box = drawer.querySelector("[data-timer]");
+      window.clearInterval(tick);
+      if (!box) return;
+      var clock = box.querySelector("[data-timer-clock]");
+      var key = "lpr-reserved-until";
+      var until = 0;
+      try { until = parseInt(window.sessionStorage.getItem(key), 10) || 0; } catch (e) {}
+      if (!until) {
+        until = Date.now() + parseInt(box.getAttribute("data-minutes"), 10) * 60000;
+        try { window.sessionStorage.setItem(key, String(until)); } catch (e) {}
+      }
+      function paint() {
+        var left = Math.max(0, Math.round((until - Date.now()) / 1000));
+        if (left === 0) { box.hidden = true; window.clearInterval(tick); return; }
+        var m = Math.floor(left / 60), sec = left % 60;
+        clock.textContent = (m < 10 ? "0" : "") + m + ":" + (sec < 10 ? "0" : "") + sec;
+      }
+      paint();
+      if (!box.hidden) tick = window.setInterval(paint, 1000);
+    }
+
+    document.addEventListener("click", function (e) {
+      var t = e.target;
+      var opener = t.closest("[data-cart-open]");
+      if (opener) { e.preventDefault(); open(); return; }
+
+      if (!drawer.contains(t)) return;
+
+      var closer = t.closest("[data-drawer-close]");
+      if (closer) {
+        /* the empty state's shop link closes the drawer and still follows the link */
+        if (closer.tagName !== "A") e.preventDefault();
+        close();
+        return;
+      }
+
+      var line = t.closest("[data-line]");
+      if (line) { change(line.getAttribute("data-line"), parseInt(line.getAttribute("data-qty"), 10)); return; }
+
+      var up = t.closest("[data-upsell]");
+      if (up && !busy) {
+        up.disabled = true;
+        add(up.getAttribute("data-upsell"), 1).catch(function (err) {
+          up.disabled = false;
+          window.alert((err && err.description) || "That product could not be added.");
+        });
+      }
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (!drawer.classList.contains("is-open")) return;
+      if (e.key === "Escape") { close(); return; }
+      if (e.key !== "Tab") return;
+      /* keep keyboard focus inside the open drawer */
+      var focusables = Array.prototype.filter.call(
+        panel.querySelectorAll("a[href], button:not([disabled]), input, select, [tabindex]:not([tabindex='-1'])"),
+        function (el) { return el.offsetParent !== null; }
+      );
+      if (!focusables.length) return;
+      var first = focusables[0], last = focusables[focusables.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === panel)) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+
+    /* product page forms add through the drawer too */
+    Array.prototype.forEach.call(document.querySelectorAll('form[action*="/cart/add"]'), function (form) {
+      form.addEventListener("submit", function (e) {
+        var id = form.querySelector('[name="id"]');
+        if (!id || !id.value) return;
+        e.preventDefault();
+        var qty = form.querySelector('[name="quantity"]');
+        var btn = form.querySelector('[type="submit"]');
+        if (btn) btn.disabled = true;
+        add(id.value, qty ? parseInt(qty.value, 10) || 1 : 1)
+          .catch(function (err) { window.alert((err && err.description) || "That product could not be added."); })
+          .then(function () { if (btn) btn.disabled = false; });
+      });
+    });
+
+    /* the browser may restore this page from its cache after checkout */
+    window.addEventListener("pageshow", function (e) { if (e.persisted) refresh(); });
+
+    window.LPRCart = { add: add, open: open, close: close, refresh: refresh };
   }
 
   /* ---------- sticky bar ---------- */
@@ -283,6 +483,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
+    cart();
     gallery();
     pricing();
     sticky();

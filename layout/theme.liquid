@@ -45,7 +45,13 @@
       <a href="#weeks">What to expect</a>
       <a href="#faq">FAQ</a>
     </nav>
-    <a class="btn btn--fill btn--sm" href="{{ routes.root_url }}#pricing">Shop</a>
+    <div class="head__end">
+      <a class="btn btn--fill btn--sm" href="{{ routes.root_url }}#pricing">Shop</a>
+      <a class="bagbtn" href="{{ routes.cart_url }}" data-cart-open aria-label="Open cart">
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M5 8h14l-1.2 12H6.2L5 8z M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span class="bagbtn__n" data-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>{{ cart.item_count }}</span>
+      </a>
+    </div>
   </div>
 </header>
 
@@ -72,6 +78,10 @@
   <span class="sticky__name">Multi Balm &middot; three sticks</span>
   <button class="btn btn--fill btn--sm" type="button" data-atc-mini>Add to bag &middot; $89.99</button>
 </div>
+
+{%- unless template.name == 'cart' -%}
+  {% section 'cart-drawer' %}
+{%- endunless -%}
 
 <script src="{{ 'theme.js' | asset_url }}" defer></script>
 </body>
