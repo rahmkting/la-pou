@@ -1,0 +1,36 @@
+<section class="inner">
+  <div class="wrap inner__narrow">
+    <h1 class="h2">Your bag</h1>
+    {%- if cart.item_count == 0 -%}
+      <p class="lede">Your bag is empty.</p>
+      <a class="btn btn--fill" href="{{ routes.root_url }}">Back to the shop</a>
+    {%- else -%}
+      <form action="{{ routes.cart_url }}" method="post" novalidate>
+        <ul class="clines">
+          {%- for item in cart.items -%}
+            <li class="cline">
+              <span class="cline__name"><a href="{{ item.url }}">{{ item.product.title }}</a></span>
+              <span class="cline__cost">{{ item.final_line_price | money }}</span>
+              <span class="cline__sub">
+                {%- unless item.variant.title contains 'Default' -%}{{ item.variant.title }} &middot; {% endunless -%}
+                {{ item.final_price | money }} each
+              </span>
+              <span></span>
+              <span class="cline__ctrl">
+                <input class="qty" type="number" min="0" name="updates[]" value="{{ item.quantity }}"
+                       aria-label="Quantity for {{ item.product.title | escape }}">
+                <a class="link-drop" href="{{ item.url_to_remove }}">Take off</a>
+              </span>
+            </li>
+          {%- endfor -%}
+        </ul>
+        <div class="totals">
+          <div class="totals__row totals__row--sum"><span>Subtotal</span><span>{{ cart.total_price | money }}</span></div>
+        </div>
+        <p class="fine">Shipping is free on every order. Taxes calculated at checkout.</p>
+        <button class="btn btn--quiet" type="submit" name="update">Update bag</button>
+        <button class="btn btn--fill btn--wide" type="submit" name="checkout">Check out</button>
+      </form>
+    {%- endif -%}
+  </div>
+</section>

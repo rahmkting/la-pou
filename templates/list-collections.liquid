@@ -1,0 +1,13 @@
+<section class="inner">
+  <div class="wrap">
+    <h1 class="h2 center">Collections</h1>
+    <ul class="trio">
+      {%- for collection in collections -%}
+        <li class="tcard">
+          <h2 class="tcard__h">{{ collection.title }}</h2>
+          <a class="btn btn--line btn--sm" href="{{ collection.url }}">View</a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>

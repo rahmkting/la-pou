@@ -1,0 +1,33 @@
+<section class="inner">
+  <div class="wrap">
+    <p class="crumb"><a href="{{ routes.root_url }}">Shop</a> / {{ product.title }}</p>
+    <div class="detail__grid">
+      <div class="detail__stage">
+        {%- if product.featured_image -%}
+          {{ product.featured_image | image_url: width: 900 | image_tag: loading: 'lazy' }}
+        {%- endif -%}
+      </div>
+      <div>
+        <h1 class="detail__name">{{ product.title }}</h1>
+        {%- form 'product', product -%}
+          <p class="buy__price">{{ product.selected_or_first_available_variant.price | money }}</p>
+          {%- if product.variants.size > 1 -%}
+            <select class="pselect" name="id">
+              {%- for v in product.variants -%}
+                <option value="{{ v.id }}" {% unless v.available %}disabled{% endunless %}>
+                  {{ v.title }} &middot; {{ v.price | money }}
+                </option>
+              {%- endfor -%}
+            </select>
+          {%- else -%}
+            <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+          {%- endif -%}
+          <button class="btn btn--fill btn--wide" type="submit" {% unless product.available %}disabled{% endunless %}>
+            {% if product.available %}Add to bag{% else %}Sold out{% endif %}
+          </button>
+        {%- endform -%}
+        <div class="rte">{{ product.description }}</div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,17 @@
+<section class="inner">
+  <div class="wrap inner__narrow">
+    <h1 class="h2">Search</h1>
+    <form action="{{ routes.search_url }}" method="get" role="search">
+      <input class="pselect" type="search" name="q" value="{{ search.terms | escape }}" placeholder="Search" aria-label="Search">
+      <button class="btn btn--fill" type="submit">Search</button>
+    </form>
+    {%- if search.performed -%}
+      <p class="fine">{{ search.results_count }} result{% if search.results_count != 1 %}s{% endif %}</p>
+      <ul class="clines">
+        {%- for item in search.results -%}
+          <li class="cline"><span class="cline__name"><a href="{{ item.url }}">{{ item.title }}</a></span></li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</section>

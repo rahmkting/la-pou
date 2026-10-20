@@ -1,0 +1,20 @@
+{
+  "general": {
+    "search": {
+      "placeholder": "Search",
+      "title": "Search"
+    },
+    "404": {
+      "title": "Page not found",
+      "subtext": "That link has moved or never existed."
+    },
+    "cart": {
+      "title": "Your bag",
+      "empty": "Your bag is empty.",
+      "checkout": "Check out",
+      "subtotal": "Subtotal",
+      "remove": "Remove",
+      "continue": "Keep shopping"
+    }
+  }
+}
