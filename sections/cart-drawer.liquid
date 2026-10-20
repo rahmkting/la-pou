@@ -1,0 +1,184 @@
+{%- comment -%}
+  Slide out cart. Rendered once in the layout, then re-rendered through the
+  Section Rendering API every time the cart changes, so prices, savings and
+  totals always come from Shopify rather than being worked out in the browser.
+{%- endcomment -%}
+{%- liquid
+  assign threshold = section.settings.free_shipping_threshold | times: 100
+  assign savings = cart.total_discount
+  assign in_cart = ''
+  for item in cart.items
+    assign in_cart = in_cart | append: ',' | append: item.product_id | append: ','
+    assign cmp = item.variant.compare_at_price | default: 0
+    if cmp > item.original_price
+      assign gap = cmp | minus: item.original_price | times: item.quantity
+      assign savings = savings | plus: gap
+    endif
+  endfor
+-%}
+<div class="drawer" data-drawer data-section="{{ section.id }}" aria-hidden="true">
+  <div class="drawer__veil" data-drawer-close></div>
+  <aside class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="drawer-title" tabindex="-1">
+    <div class="drawer__body" data-drawer-body data-count="{{ cart.item_count }}">
+
+      <header class="dr-head">
+        <h2 class="dr-head__title" id="drawer-title">Cart <span>({{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }})</span></h2>
+        <button class="dr-head__x" type="button" data-drawer-close aria-label="Close cart">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </header>
+
+      {%- if cart.item_count == 0 -%}
+        <div class="dr-empty">
+          <p class="dr-empty__h">Your bag is empty.</p>
+          <p>One stick is where most women start.</p>
+          <a class="btn btn--fill" href="{{ routes.root_url }}#pricing" data-drawer-close>Shop the balm</a>
+        </div>
+      {%- else -%}
+        <div class="dr-scroll">
+
+          {%- if section.settings.timer_minutes > 0 -%}
+            <p class="dr-timer" data-timer data-minutes="{{ section.settings.timer_minutes }}">
+              Your order is reserved for <b data-timer-clock>{{ section.settings.timer_minutes }}:00</b>
+            </p>
+          {%- endif -%}
+
+          <div class="dr-ship">
+            {%- if threshold == 0 or cart.total_price >= threshold -%}
+              <p class="dr-ship__msg">Your order qualifies for <b>free shipping</b></p>
+              {%- assign pct = 100 -%}
+            {%- else -%}
+              <p class="dr-ship__msg">You are <b>{{ threshold | minus: cart.total_price | money }}</b> away from free shipping</p>
+              {%- assign pct = cart.total_price | times: 100 | divided_by: threshold -%}
+            {%- endif -%}
+            <div class="dr-ship__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ pct }}" aria-label="Progress to free shipping">
+              <span style="width: {{ pct }}%"></span>
+              <i aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="18" height="18"><path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5v-9z M3 7.5L12 12l9-4.5 M12 12v9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+              </i>
+            </div>
+          </div>
+
+          <ul class="dr-lines">
+            {%- for item in cart.items -%}
+              {%- liquid
+                assign cmp_line = item.variant.compare_at_price | default: 0 | times: item.quantity
+                assign was = item.original_line_price
+                if cmp_line > was
+                  assign was = cmp_line
+                endif
+              -%}
+              <li class="dr-line">
+                <a class="dr-line__shot" href="{{ item.url }}" tabindex="-1">
+                  {%- if item.image -%}
+                    <img src="{{ item.image | image_url: width: 240 }}" alt="{{ item.image.alt | default: item.product.title | escape }}" width="120" height="120" loading="lazy">
+                  {%- endif -%}
+                </a>
+                <div class="dr-line__info">
+                  <a class="dr-line__name" href="{{ item.url }}">{{ item.product.title }}</a>
+                  {%- unless item.product.has_only_default_variant -%}
+                    {%- for o in item.options_with_values -%}
+                      <p class="dr-line__opt">{{ o.name }}: {{ o.value }}</p>
+                    {%- endfor -%}
+                  {%- endunless -%}
+                  {%- for d in item.line_level_discount_allocations -%}
+                    <p class="dr-line__opt dr-line__opt--deal">{{ d.discount_application.title }} (&minus;{{ d.amount | money }})</p>
+                  {%- endfor -%}
+                  <div class="dr-line__ctrl">
+                    <div class="dr-qty">
+                      <button type="button" data-line="{{ item.key }}" data-qty="{{ item.quantity | minus: 1 }}" aria-label="One fewer {{ item.product.title | escape }}">&minus;</button>
+                      <span aria-live="polite">{{ item.quantity }}</span>
+                      <button type="button" data-line="{{ item.key }}" data-qty="{{ item.quantity | plus: 1 }}" aria-label="One more {{ item.product.title | escape }}">+</button>
+                    </div>
+                    <button class="dr-line__drop" type="button" data-line="{{ item.key }}" data-qty="0">Remove</button>
+                  </div>
+                </div>
+                <div class="dr-line__cost">
+                  <b>{{ item.final_line_price | money }}</b>
+                  {%- if was > item.final_line_price %}<s>{{ was | money }}</s>{% endif -%}
+                </div>
+              </li>
+            {%- endfor -%}
+          </ul>
+
+          {%- capture upsell_cards -%}
+            {%- for p in section.settings.upsell_products -%}
+              {%- assign tag = ',' | append: p.id | append: ',' -%}
+              {%- unless p.available == false or in_cart contains tag -%}
+                {%- assign uv = p.selected_or_first_available_variant -%}
+                <li class="dr-up">
+                  <a class="dr-up__shot" href="{{ p.url }}" tabindex="-1">
+                    {%- if p.featured_image -%}
+                      <img src="{{ p.featured_image | image_url: width: 200 }}" alt="{{ p.featured_image.alt | default: p.title | escape }}" width="100" height="100" loading="lazy">
+                    {%- endif -%}
+                  </a>
+                  <div class="dr-up__info">
+                    <a class="dr-up__name" href="{{ p.url }}">{{ p.title }}</a>
+                    <p class="dr-up__cost">
+                      <b>{{ uv.price | money }}</b>
+                      {%- if uv.compare_at_price > uv.price %} <s>{{ uv.compare_at_price | money }}</s>{% endif -%}
+                    </p>
+                  </div>
+                  <button class="btn btn--fill btn--sm dr-up__add" type="button" data-upsell="{{ uv.id }}">Add</button>
+                </li>
+              {%- endunless -%}
+            {%- endfor -%}
+          {%- endcapture -%}
+
+          {%- if upsell_cards != blank -%}
+            <div class="dr-ups">
+              <p class="dr-ups__h"><span>{{ section.settings.upsell_heading }}</span></p>
+              {%- if section.settings.upsell_subheading != blank -%}
+                <p class="dr-ups__sub">{{ section.settings.upsell_subheading }}</p>
+              {%- endif -%}
+              <ul class="dr-ups__list">{{ upsell_cards }}</ul>
+            </div>
+          {%- endif -%}
+
+        </div>
+
+        <footer class="dr-foot">
+          {%- if savings > 0 -%}
+            <p class="dr-foot__save"><span>Total savings</span><b>{{ savings | money }}</b></p>
+          {%- endif -%}
+          <form action="{{ routes.cart_url }}" method="post">
+            <button class="dr-foot__go" type="submit" name="checkout">Checkout &middot; {{ cart.total_price | money }}</button>
+          </form>
+          {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
+            <ul class="dr-pay" aria-label="Accepted payment methods">
+              {%- for type in shop.enabled_payment_types -%}
+                <li>{{ type | payment_type_svg_tag }}</li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+          {%- if section.settings.footer_note != blank -%}
+            <p class="dr-foot__note">{{ section.settings.footer_note }}</p>
+          {%- endif -%}
+        </footer>
+      {%- endif -%}
+
+    </div>
+  </aside>
+</div>
+
+{% schema %}
+{
+  "name": "Cart drawer",
+  "settings": [
+    { "type": "header", "content": "Reservation timer" },
+    { "type": "range", "id": "timer_minutes", "label": "Minutes", "min": 0, "max": 30, "step": 1, "default": 10,
+      "info": "Counts down from the first time a shopper opens the cart. Set to 0 to hide it." },
+    { "type": "header", "content": "Free shipping bar" },
+    { "type": "number", "id": "free_shipping_threshold", "label": "Free shipping from (in your store currency)", "default": 0,
+      "info": "Leave at 0 when every order ships free. The bar then always shows as full." },
+    { "type": "header", "content": "Complete your look" },
+    { "type": "product_list", "id": "upsell_products", "label": "Products to offer", "limit": 4,
+      "info": "Products already in the cart, or sold out, are skipped." },
+    { "type": "text", "id": "upsell_heading", "label": "Heading", "default": "Complete your routine" },
+    { "type": "text", "id": "upsell_subheading", "label": "Subheading", "default": "Added by women who bought the balm" },
+    { "type": "header", "content": "Footer" },
+    { "type": "checkbox", "id": "show_payment_icons", "label": "Show payment icons", "default": true },
+    { "type": "text", "id": "footer_note", "label": "Note under checkout", "default": "Free shipping included. 30 day guarantee." }
+  ]
+}
+{% endschema %}
