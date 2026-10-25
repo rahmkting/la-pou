@@ -12,9 +12,7 @@
     "landing": {
       "type": "landing",
       "settings": {
-        "product_single": "pdrn-pink-collagen-volume-multi-balm",
-        "product_three": "pdrn-pink-collagen-volume-balm-3-pack",
-        "product_six": "pdrn-pink-collagen-volume-balm-6-pack"
+        "product_single": "pdrn-pink-collagen-volume-multi-balm"
       }
     }
   },

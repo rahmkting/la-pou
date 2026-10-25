@@ -62,7 +62,8 @@
       var input = current();
       /* price text comes straight from Shopify so the page and the cart
          can never quote different numbers */
-      var label = "Add to bag \u00b7 " + (input.getAttribute("data-money") || "");
+      var price = input.getAttribute("data-money");
+      var label = "Add to bag" + (price ? " \u00b7 " + price : "");
 
       tiers.forEach(function (t) {
         t.classList.toggle("is-picked", t.contains(input));
@@ -75,7 +76,7 @@
       if (mini) mini.textContent = label;
       if (miniName) {
         var n = input.value;
-        miniName.textContent = "Multi Balm \u00b7 " + (n === "1" ? "one stick" : n === "3" ? "three sticks" : "six sticks");
+        miniName.textContent = "Multi Balm \u00b7 " + (n === "1" ? "one stick" : n === "2" ? "two sticks" : "four sticks");
       }
     }
 
@@ -120,6 +121,14 @@
           window.alert((e && e.description) || "That bundle could not be added. It may be out of stock.");
         });
     }
+
+    /* "Start with two sticks" and friends pre-pick their tier on the way to the buy box */
+    document.addEventListener("click", function (e) {
+      var link = e.target.closest("[data-pick]");
+      if (!link) return;
+      var input = document.querySelector('.tier input[value="' + link.getAttribute("data-pick") + '"]');
+      if (input && !input.checked) { input.checked = true; paint(); }
+    });
 
     atc.addEventListener("click", addToCart);
     if (mini) mini.addEventListener("click", addToCart);

@@ -222,7 +222,9 @@ a { color: inherit; }
 .gal__reel { list-style: none; margin: 0; padding: 0; }
 .gal__slide { display: none; }
 .gal__slide.is-on { display: block; }
-.gal__slide img { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; }
+.gal__slide img { width: 100%; height: auto; aspect-ratio: 1 / 1; object-fit: cover; }
+/* the chart has words to the edges, so it is fitted rather than cropped */
+.gal__slide--fit img { object-fit: contain; background: #f5efdf; }
 
 .gal__arrow {
   position: absolute; top: 50%; z-index: 3;
@@ -358,6 +360,7 @@ a { color: inherit; }
 .tier__cost { text-align: right; display: grid; gap: 0.1rem; }
 .tier__cost b { font-family: var(--display); font-size: 1.5rem; font-weight: 400; }
 .tier__cost s { font-size: 0.78rem; color: var(--taupe); }
+.tier__cost .tier__none { font-family: var(--body); font-size: 0.78rem; font-weight: 700; color: var(--wine); }
 
 .tier__flag, .tier__save {
   position: absolute; top: -0.7rem;
