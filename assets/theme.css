@@ -360,7 +360,6 @@ a { color: inherit; }
 .tier__cost { text-align: right; display: grid; gap: 0.1rem; }
 .tier__cost b { font-family: var(--display); font-size: 1.5rem; font-weight: 400; }
 .tier__cost s { font-size: 0.78rem; color: var(--taupe); }
-.tier__cost .tier__none { font-family: var(--body); font-size: 0.78rem; font-weight: 700; color: var(--wine); }
 
 .tier__flag, .tier__save {
   position: absolute; top: -0.7rem;
