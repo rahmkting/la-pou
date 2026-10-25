@@ -9,6 +9,10 @@
  */
 {
   "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {}
+    },
     "landing": {
       "type": "landing",
       "settings": {
@@ -17,6 +21,7 @@
     }
   },
   "order": [
+    "hero",
     "landing"
   ]
 }
