@@ -92,7 +92,9 @@
       var input = current();
       var variant = input.getAttribute("data-variant");
       if (!variant) {
-        window.alert("This bundle has no product attached yet.\n\nOpen the theme editor, select the Landing page section, and choose a product for each tier.");
+        window.alert(window.Shopify && window.Shopify.designMode
+          ? "This bundle has no product attached yet.\n\nOpen the theme editor, select the Landing page section, and choose a product for each tier."
+          : "Sorry, this bundle is not available right now. Please choose another option.");
         return;
       }
       [atc, mini].forEach(function (b) { if (b) { b.disabled = true; } });
