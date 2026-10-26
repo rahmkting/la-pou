@@ -372,23 +372,6 @@ a { color: inherit; }
 .assure li { display: flex; align-items: center; gap: 0.4rem; }
 .assure__ico { color: var(--wine); }
 
-/* theme editor diagnostics, never rendered for shoppers */
-.diag {
-  margin-top: 1rem; padding: 0.8rem 1rem;
-  border: 1px dashed var(--rose); border-radius: var(--r-sm);
-  background: var(--blush);
-  font-size: 0.78rem; line-height: 1.5; color: var(--ink);
-}
-.diag__h {
-  margin: 0 0 0.5rem;
-  font-size: 0.62rem; font-weight: 800;
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--wine);
-}
-.diag__row { margin: 0 0 0.4rem; overflow-wrap: anywhere; }
-.diag__row:last-child { margin-bottom: 0; }
-.diag__row--bad { color: var(--wine); font-weight: 700; }
-
 /* accordion */
 .acc { margin-top: 1.6rem; border-top: 1px solid var(--rule); }
 .acc__item { border-bottom: 1px solid var(--rule); }
